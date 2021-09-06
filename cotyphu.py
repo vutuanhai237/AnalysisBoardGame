@@ -2,7 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 # ['nhà', 'kv', 'ch', 'bx', 'ct']
-site = [0, 1, 2, 3, 4, 5]
+site = [0, 1, 2, 3, 4]
 # Danh sách các điểm khí vận
 list_site_kv = [2, 17, 33]
 # Danh sách các điểm cơ hội
@@ -17,47 +17,53 @@ list_site_vodung = [0, 10, 20, 30]
 list_site_nha = [x for x in range(0, 40) if (x not in list_site_kv) and (x not in list_site_ch) and (x not in list_site_bx) and (x not in list_site_ct) and (x not in list_site_vodung)]
 
 def den_site_gan_nhat(x, list_site):
-    kcs = []
+    khoang_cachs = []
     for site in list_site:
-        kcs.append(abs(site - x))
-    min_kc = min(kcs)
-    min_index_kc = kcs.index(min_kc)
+        khoang_cachs.append(abs(site - x))
+    min_kc = min(khoang_cachs)
+    min_index_kc = khoang_cachs.index(min_kc)
     return list_site[min_index_kc]
 
 def co_hoi (x, command):
+    # Đi lùi 3 bước
+    if command == 4:
+        x = x - 3
+        if x < 0:
+            x = 40 - x
+    # Đến ô Nguyễn Tri Phương
     if command == 5:
         x = 24
-    if command == 13:
-        x = 11
-    # Đến ô bến xe gần nhất
-    if command == 15 or command == 16:
-        x = den_site_gan_nhat(x, list_site_bx)
+    # Vào tù
     if command == 7:
         x = 30
-    if command == 12:
-        x = 39
-    if command == 14:
-        x = 5
     # Đến ô công ty gần nhất
     if command == 10:
         x = den_site_gan_nhat(x, list_site_ct)
     # Đến ô bắt đầu
     if command == 11:
         x = 0
-    # Đi lùi 3 bước
-    if command == 4:
-        x = x - 3
-        if x < 0:
-            x = 40 - x
+    # Đến ô Tân Kỳ Tân Qúy
+    if command == 12:
+        x = 39
+    # Đến ô Nguyễn Tất Thành
+    if command == 13:
+        x = 11
+    # Đến ô bến xe Cần Giuộc
+    if command == 14:
+        x = 5
+    # Đến ô bến xe gần nhất
+    if command == 15 or command == 16:
+        x = den_site_gan_nhat(x, list_site_bx)
     return x
 
 def khi_van (x, command):
-    # Vào tù
-    if command == 14:
-        x = 30
     # Đến ô bắt đầu
     if command == 10:
         x = 0
+    # Vào tù
+    if command == 14:
+        x = 30
+    
     return x
 
 maps = np.zeros((40))
@@ -91,7 +97,7 @@ random.shuffle(cohois)
 
 xs = []
 x = 0
-for i in range(0, 40*1000000):
+for i in range(0, 40000000):
     # Lắc 2 xúc xắc & đi
     x = x + random.randrange(2, 13)
     if x in list_site_kv:
@@ -118,14 +124,16 @@ for i in range(0, 40):
 # Vẽ biểu đồ thể hiện kết quả
 np.asarray(xs)
 frequency_nha = []
+tong_frequency_nha = 0
 for i in list_site_nha:
+    tong_frequency_nha += frequency[i]
+for i in list_site_nha:
+    # frequency_nha.append(round(frequency[i]/tong_frequency_nha*100, 2))
     frequency_nha.append(frequency[i])
-
 zip_iterator = zip(list_site_nha, frequency_nha)
 a = dict(zip_iterator)
 print(dict(sorted(a.items(), key=lambda item: item[1])))
 
-print(len(list_site_nha))
 plt.scatter(list_site_nha, frequency_nha)
 for i in range(0, len(list_site_nha)):
     plt.annotate(list_site_nha[i], (list_site_nha[i] + 0.3, frequency_nha[i] + 0.3))
